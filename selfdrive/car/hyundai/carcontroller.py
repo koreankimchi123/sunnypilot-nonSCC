@@ -158,10 +158,11 @@ class CarController():
                                    left_lane, right_lane,
                                    left_lane_warning, right_lane_warning))
 
+    allow_stock_speed_buttons = self.car_fingerprint != CAR.IONIQ_EV_2020
     if not CS.CP.openpilotLongitudinalControl:
       if pcm_cancel_cmd:
         can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.CANCEL))
-      elif CS.out.cruiseState.standstill:
+      elif allow_stock_speed_buttons and CS.out.cruiseState.standstill:
         self.standstill_status = 1
         if Params().get_bool("StockResumeAlt"):
           if self.last_lead_distance == 0:
@@ -181,7 +182,7 @@ class CarController():
             self.last_resume_frame = frame
       elif self.last_lead_distance != 0:
         self.last_lead_distance = 0
-      if not CS.out.cruiseState.standstill and (enabled and CS.acc_active):
+      if allow_stock_speed_buttons and not CS.out.cruiseState.standstill and (enabled and CS.acc_active):
         cruise_button = self.get_cruise_buttons(CS)
         if cruise_button is not None:
           can_sends.append(create_clu11(self.packer, self.resume_count, CS.clu11, cruise_button))
