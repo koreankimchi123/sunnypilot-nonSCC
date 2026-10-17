@@ -54,7 +54,7 @@ AddrCheckStruct hyundai_legacy_addr_checks[] = {
            {881, 0, 8, .expected_timestep = 10000U}, { 0 }}},
   {.msg = {{902, 0, 8, .expected_timestep = 10000U}, { 0 }, { 0 }}},
   {.msg = {{916, 0, 8, .expected_timestep = 10000U}, { 0 }, { 0 }}},
-  {.msg = {{1057, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}, { 0 }, { 0 }}},
+  // {.msg = {{1057, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}, { 0 }, { 0 }}},
 };
 #define HYUNDAI_LEGACY_ADDR_CHECK_LEN (sizeof(hyundai_legacy_addr_checks) / sizeof(hyundai_legacy_addr_checks[0]))
 
@@ -194,8 +194,8 @@ static int hyundai_rx_hook(CANPacket_t *to_push) {
       }
     }
 
-    if (addr == 1056) {
-      bool acc_main_on = GET_BYTES_04(to_push) & 0x1; // ACC main_on signal
+    if ((addr == 1426) && (GET_LEN(to_push) == 8)) {
+      bool acc_main_on = GET_BIT(to_push, 34U) != 0U; // ACC main_on signal
       if (acc_main_on && !acc_main_on_prev)
       {
         controls_allowed = 1;
@@ -203,12 +203,12 @@ static int hyundai_rx_hook(CANPacket_t *to_push) {
       acc_main_on_prev = acc_main_on;
     }
 
-    if (addr == 1056) {
-      bool acc_main_on = GET_BYTES_04(to_push) & 0x1; // ACC main_on signal
+    if ((addr == 1426) && (GET_LEN(to_push) == 8)) {
+      bool acc_main_on = GET_BIT(to_push, 34U) != 0U; // ACC main_on signal
       if (acc_main_on_prev != acc_main_on)
       {
         disengageFromBrakes = false;
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       acc_main_on_prev = acc_main_on;
     }

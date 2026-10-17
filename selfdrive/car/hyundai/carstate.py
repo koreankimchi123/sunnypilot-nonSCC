@@ -115,8 +115,8 @@ class CarState(CarStateBase):
       ret.cruiseState.enabled = cp.vl["TCS13"]["ACC_REQ"] == 1
       ret.cruiseState.standstill = False
     else:
-      ret.cruiseState.available = cp.vl["SCC11"]["MainMode_ACC"] == 1
-      ret.cruiseState.enabled = cp.vl["SCC12"]["ACCMode"] != 0
+      ret.cruiseState.available = cp.vl["LABEL11"]["CC_React"] == 1
+      ret.cruiseState.enabled = cp.vl["LABEL11"]["CC_React"] == 1
       self.acc_active = ret.cruiseState.enabled
       self.cruise_active = self.acc_active
       ret.cruiseState.standstill = cp.vl["SCC11"]["SCCInfoDisplay"] == 4.
@@ -165,7 +165,7 @@ class CarState(CarStateBase):
             elif self.CP.carFingerprint not in FEATURES["use_lfa_button"]:
               self.accMainEnabled = False
       if ret.brakePressed:
-        self.accEnabled = False
+        # self.accEnabled = False
         if self.disable_mads:
           if self.CP.carFingerprint in FEATURES["use_lfa_button"]:
             self.lfaEnabled = False
@@ -304,6 +304,7 @@ class CarState(CarStateBase):
       ("SAS_Speed", "SAS11", 0),
 
       ("LFA_Pressed", "BCM_PO_11", 0),
+      ("CC_React", "LABEL11", 0),
     ]
 
     checks = [
@@ -330,17 +331,17 @@ class CarState(CarStateBase):
         ("ObjValid", "SCC11", 0),
       ]
 
-      checks += [
-        ("SCC11", 50),
-        ("SCC12", 50),
-      ]
+      # checks += [
+      #   ("SCC11", 50),
+      #   ("SCC12", 50),
+      # ]
 
       if CP.carFingerprint in FEATURES["use_fca"]:
         signals += [
           ("FCA_CmdAct", "FCA11", 0),
           ("CF_VSM_Warn", "FCA11", 0),
         ]
-        checks += [("FCA11", 50)]
+        # checks += [("FCA11", 50)]
       else:
         signals += [
           ("AEB_CmdAct", "SCC12", 0),

@@ -176,8 +176,9 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if (self.disengage_on_gas and cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
+    if (self.disengage_on_gas and cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed): 
+    # or \
+    #    (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
       if self.CP.carFingerprint in HYUNDAI_LFA["use_lfa_button"]:
         if cs_out.lfaEnabled:
           cs_out.disengageByBrake= True

@@ -418,6 +418,30 @@ class CarInterface(CarInterfaceBase):
           else:
             events.add(EventName.manualLongitudinalRequired)
 
+    # Auto-enable when cruise is enabled, gear is D, and speed >= 15 km/h.
+    auto_enable_ready = (
+      ret.cruiseState.enabled
+      and ret.gearShifter == car.CarState.GearShifter.drive
+      and ret.vEgo >= 15.0 * CV.KPH_TO_MS
+    )
+
+    prev = self.CS.out
+    was_auto_enable_ready = (
+      prev.cruiseState.enabled
+      and prev.gearShifter == car.CarState.GearShifter.drive
+      and prev.vEgo >= 15.0 * CV.KPH_TO_MS
+    )
+
+    cancel_pressed = any(
+      b.type == ButtonType.cancel and b.pressed
+      for b in ret.buttonEvents
+    )
+
+    if (auto_enable_ready and not was_auto_enable_ready
+        and not c.enabled
+        and not events.any(ET.USER_DISABLE)
+        and not events.any(ET.NO_ENTRY)):
+      events.add(EventName.pcmEnable)
     if (ret.cruiseState.enabled or self.CS.lfaEnabled or self.CS.accMainEnabled) and enable_pressed:
       if enable_from_brake:
         events.add(EventName.silentButtonEnable)
